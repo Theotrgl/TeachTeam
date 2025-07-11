@@ -6,8 +6,7 @@ This is a frontend-only React TypeScript project for the TeachTeam (TT) system. 
 
 1. **Clone the repo:**
    ```bash
-   git clone git@github.com:rmit-fsd-2025-s1/s4115252-s4115477-a1.git
-   cd assignment-1
+   git clone git@github.com:Theotrgl/TeachTeam.git
    ```
 
 2. **Install dependencies:**
