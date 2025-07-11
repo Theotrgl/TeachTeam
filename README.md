@@ -1,4 +1,4 @@
-# TeachTeam (TT) – Frontend Prototype
+# TeachTeam (TT)
 
 This is a NextJS-TypeScript project for the TeachTeam (TT) system which is a prototype webapp for hiring tutors.
 
