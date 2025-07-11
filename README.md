@@ -1,13 +1,12 @@
 # TeachTeam (TT) – Frontend Prototype
 
-This is a frontend-only React TypeScript project for the TeachTeam (TT) system. It's a prototype for hiring casual tutors at the School of Computer Science.
+This is a NextJS-TypeScript project for the TeachTeam (TT) system which is a prototype webapp for hiring tutors.
 
 ## 👨‍🏫 How to Run the Project
 
 1. **Clone the repo:**
     ```bash
-    git clone git@github.com:rmit-fsd-2025-s1/s4115252-s4115477-a2.git
-    cd assignment-2
+    git clone git@github.com:Theotrgl/TeachTeam.git
     ```
 
 2. **Go to respective folders:**
