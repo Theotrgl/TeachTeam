@@ -26,7 +26,7 @@ export default function CourseSelect() {
 
   return (
     <Layout>
-      {user?.role == "candidate" ? (
+      {user?.role == "Candidate" ? (
         <div className="container mx-auto px-6 py-12">
           <h1 className="text-4xl font-bold text-black mb-6">Courses</h1>
 

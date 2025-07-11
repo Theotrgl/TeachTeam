@@ -99,7 +99,24 @@ export const typeDefs = gql`
     login(username: String!, password: String!): String
   }
 
+  input CreateUserInput {
+    firstName: String!
+    lastName: String!
+    email: String!
+    role: String!
+    password: String!
+  }
+
   type Mutation {
+    updateUser(
+      id: ID!
+      firstName: String
+      lastName: String
+      role: String
+    ): User!
+
+    createUser(input: CreateUserInput!): User!
+
     createProfile(
       about: String!
       pictureURI: String!

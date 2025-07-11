@@ -6,7 +6,6 @@ import { Courses } from "./entity/Courses";
 import { SelectedCourses } from "./entity/selectedCourses";
 import { SelectedTutors } from "./entity/selectedTutors";
 import { Comments } from "./entity/Comments";
-import { PrevRoles } from "./entity/prevRoles";
 import { TutorOrder } from "./entity/tutorOrder";
 
 export const AppDataSource = new DataSource({
@@ -21,7 +20,7 @@ export const AppDataSource = new DataSource({
   // but should be disabled in production to prevent accidental data loss.
   synchronize: true,
   logging: true,
-  entities: [User, Profile, Comments, Courses, SelectedCourses, SelectedTutors, PrevRoles, TutorOrder],
+  entities: [User, Profile, Comments, Courses, SelectedCourses, SelectedTutors, TutorOrder],
   migrations: [],
   subscribers: [],
 });

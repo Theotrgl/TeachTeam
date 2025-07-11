@@ -153,7 +153,7 @@ export default function ProfilePage() {
                   </ul>
                 )}
 
-                {user?.role == "candidate" && (
+                {user?.role == "Candidate" && (
                   <>
                     <h2 className="text-2xl font-bold text-black mt-6 mb-4">
                       Availability

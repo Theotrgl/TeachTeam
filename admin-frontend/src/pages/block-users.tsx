@@ -1,5 +1,7 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
 import withAuth from "@/lib/withAuth";
+import UserUpdateForm from "@/components/userUpdate";
+import CreateUserForm from "@/components/createUser";
 
 const GET_USERS = gql`
   query {
@@ -72,6 +74,9 @@ function BlockUsersPage() {
           </li>
         ))}
       </ul>
+
+      <CreateUserForm />
+      <UserUpdateForm users={data.users} />
     </div>
   );
 }

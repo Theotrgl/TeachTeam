@@ -70,14 +70,14 @@ function CandidatesPage() {
         </h2>
         <ul className="bg-white p-4 rounded-lg shadow border border-[var(--border)] space-y-1">
           {data.candidatesWithMoreThan3Courses
-            .filter((user: any) => user.role === "candidate")
-            .map((user: any) => (
+            .filter((user: any) => user.role === "Candidate")
+            .map((user: any) => ( 
               <li key={user.id} className="text-[var(--black)]">
                 {user.firstName} {user.lastName}
               </li>
             ))}
           {data.candidatesWithMoreThan3Courses.filter(
-            (u: any) => u.role === "candidate"
+            (u: any) => u.role === "Candidate"
           ).length === 0 && <p className="italic text-[var(--gray)]">None</p>}
         </ul>
       </section>
@@ -89,14 +89,14 @@ function CandidatesPage() {
         </h2>
         <ul className="bg-white p-4 rounded-lg shadow border border-[var(--border)] space-y-1">
           {data.candidatesWithNoCourses
-            .filter((user: any) => user.role === "candidate")
+            .filter((user: any) => user.role === "Candidate")
             .map((user: any) => (
               <li key={user.id} className="text-[var(--black)]">
                 {user.firstName} {user.lastName}
               </li>
             ))}
           {data.candidatesWithNoCourses.filter(
-            (u: any) => u.role === "candidate"
+            (u: any) => u.role === "Candidate"
           ).length === 0 && <p className="italic text-[var(--gray)]">None</p>}
         </ul>
       </section>

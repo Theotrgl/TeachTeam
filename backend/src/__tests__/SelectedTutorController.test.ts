@@ -103,11 +103,11 @@ describe("SelectedTutorController", () => {
     // Step 2: Mock selectedCoursesRepo to return courses with various lecturers
     const mockFindCourses = jest.fn().mockResolvedValue([
       {
-        user: { id: 1, role: "candidate" },
+        user: { id: 1, role: "Candidate" },
         courses: [{ lecturer: { id: 2 } }],
       },
       {
-        user: { id: 2, role: "candidate" },
+        user: { id: 2, role: "Candidate" },
         courses: [{ lecturer: { id: 3 } }], // This one should be ignored
       },
     ]);

@@ -20,3 +20,4 @@ export class Comments {
   @Column()
   comment!: string;
 }
+  

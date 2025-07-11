@@ -24,9 +24,9 @@ export interface User {
   username: string;
   password: string;
   profile_idt: number;
-  profileId: number,
-  createdAt: Date,
-  updatedAt: Date,
+  profileId: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Profile {
@@ -60,6 +60,13 @@ export interface SelectedTutors {
   lecturerId: number;
   tutors: User[];
 }
+
+export interface Comment {
+    lecturer_id: number;
+    tutor_id: number;
+    comment: string;
+}
+
 export const userApi = {
   getAllUsers: async () => {
     const response = await api.get("/users");
@@ -202,5 +209,25 @@ export const tutorOrderApi = {
   saveTutorOrder: async (userId: number, tutorIds: number[]) => {
     const response = await api.post(`/tutor-order/${userId}`, { tutorIds });
     return response.data;
+  },
+};
+
+export const commentApi = {
+  // Add a new comment from a lecturer to a tutor
+  addComment: async (text: string, lecturerId: number, tutorId: number) => {
+    const response = await api.post("/comments", {
+      comment: text,
+      lecturer_id: lecturerId,
+      tutor_id: tutorId,
+    });
+    return response.data;
+  },
+
+  // Get comments from a specific lecturer for a specific tutor
+  getCommentForTutor: async (lecturerId: number, tutorId: number) => {
+    const response = await api.get(
+      `/comments/lookup?lecturerId=${lecturerId}&tutorId=${tutorId}`
+    );
+    return response.data; // should be an array of comments
   },
 };

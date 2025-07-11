@@ -19,7 +19,9 @@ export class UserController {
    * @returns JSON response containing an array of all users
    */
   async all(request: Request, response: Response) {
-    const users = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      relations: ["profile"]
+    });
 
     return response.json(users);
   }
@@ -82,7 +84,7 @@ export class UserController {
         .json({ message: "Names must contain only letters" });
     }
 
-    const validRoles = ["candidate", "tutor", "lecturer"];
+    const validRoles = ["Candidate", "Lecturer"];
     if (!validRoles.includes(role)) {
       return response.status(400).json({ message: "Invalid role selected" });
     }

@@ -48,7 +48,7 @@ test("save - successfully registers a user", async () => {
       password: "StrongPass1!",
       firstName: "John",
       lastName: "Doe",
-      role: "tutor",
+      role: "Lecturer",
     },
   };
 
@@ -84,7 +84,7 @@ test("save - fails due to invalid email format", async () => {
       password: "StrongPass1!",
       firstName: "Jane",
       lastName: "Doe",
-      role: "candidate",
+      role: "Candidate",
     },
   };
 

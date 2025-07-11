@@ -53,7 +53,7 @@ export function NavBar() {
                     <a href="/tutors">Tutors</a>
                   </li>
                 )}
-                {user?.role === "candidate" && (
+                {user?.role === "Candidate" && (
                   <li className="p-3 transition-transform transform hover:scale-115">
                     <a href="/course-select">Courses</a>
                   </li>
@@ -108,7 +108,7 @@ export function NavBar() {
                   Tutors
                 </a>
               )}
-              {user?.role === "candidate" && (
+              {user?.role === "Candidate" && (
                 <a
                   href="/course-select"
                   className="text-black hover:text-gray transition-transform transform hover:scale-110 mt-6"

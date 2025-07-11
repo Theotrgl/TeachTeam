@@ -31,43 +31,50 @@ const CommentPopUp: React.FC<CommentPopUpProps> = ({
     onClose();
 
     const updatedTutors = dragTutors.filter((t) => t.id !== tutor.id);
-    reorderTutors(updatedTutors); // Ensure the list is updated in DragNDrop context
+    reorderTutors(updatedTutors);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
       alert("You must be logged in as a lecturer to comment.");
       return;
     }
-
-    let isValid = true;
-
-    if (comment.length <= 0) {
+    if (comment.trim().length === 0) {
       setError("Comment field cannot be empty!");
-      isValid = false;
+      return;
     }
-
-    if (!isValid) return;
-
-    const success = addComment(comment, user, tutor);
+    const success = await addComment(comment, user, tutor);
     if (success) {
       toast.success("Comment successfully submitted!");
-    } else {
-      setError("Invalid input");
-    }
+      // Option 1: Close popup
+      onClose();
 
-    if (comment.length <= 0) {
+      // Option 2: Or keep open and update UI:
+      // const updatedComment = await getCommentForTutor(user, tutor);
+      // setComment(updatedComment?.comment || "");
+    } else {
+      setError("Failed to submit comment. Please try again.");
     }
-    addComment(comment, user, tutor);
-    setComment("");
-    onClose();
   };
 
   useEffect(() => {
     if (!user || !tutor) return;
-    const currentComment = getCommentForTutor(user, tutor);
-    setComment(currentComment ?? "");
+
+    let isMounted = true;
+
+    const fetchComment = async () => {
+      const c = await getCommentForTutor(user, tutor);
+      if (isMounted) {
+        setComment(c?.comment || "");
+      }
+    };
+
+    fetchComment();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user, tutor, getCommentForTutor]);
 
   return (

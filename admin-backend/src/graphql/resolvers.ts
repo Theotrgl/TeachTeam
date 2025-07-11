@@ -50,39 +50,56 @@ export const resolvers = {
     tutorOrders: async () => await tutorOrderRepository.find(),
     comments: async () => await commentsRepository.find(),
     prevRoles: async () => await prevRolesRepository.find(),
+
     candidatesPerCourse: async () => {
-      const selections = await selectedCoursesRepository.find({
-        relations: ["courses", "user"],
+      const selections = await selectedTutorsRepository.find({
+        relations: ["tutors"],
       });
 
+      const courses = await courseRepository.find({
+        relations: ["lecturer"],
+      });
+
+      // Map lecturerId to course info
+      const lecturerToCourseMap: Record<number, { id: number; title: string }> =
+        {};
+      for (const course of courses) {
+        if (course.lecturer) {
+          lecturerToCourseMap[course.lecturer.id] = {
+            id: course.id,
+            title: course.title,
+          };
+        }
+      }
+
+      // Group tutors by course
       const courseMap: Record<
-        string,
+        number,
         { id: number; title: string; candidates: any[] }
       > = {};
 
       for (const selection of selections) {
-        const user = selection.user;
-        const isCandidate = user?.role === "candidate";
-        if (!isCandidate) continue;
+        const course = lecturerToCourseMap[selection.lecturerId];
+        if (!course) continue;
 
-        for (const course of selection.courses || []) {
-          if (!courseMap[course.id]) {
-            courseMap[course.id] = {
-              id: course.id,
-              title: course.title,
-              candidates: [],
-            };
-          }
+        if (!courseMap[course.id]) {
+          courseMap[course.id] = {
+            id: course.id,
+            title: course.title,
+            candidates: [],
+          };
+        }
 
+        for (const tutor of selection.tutors || []) {
           courseMap[course.id].candidates.push({
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            id: tutor.id,
+            firstName: tutor.firstName,
+            lastName: tutor.lastName,
           });
         }
       }
 
-      // Fetch all courses to include courses with no candidates
+      // Include all courses, even with no candidates
       const allCourses = await courseRepository.find();
 
       const result = allCourses.map((course) => ({
@@ -95,96 +112,248 @@ export const resolvers = {
     },
 
     candidatesWithMoreThan3Courses: async () => {
+      // Fetch all selectedCourses (candidate's applied courses)
       const selections = await selectedCoursesRepository.find({
         relations: ["user", "courses"],
       });
 
-      console.log("Total selection entries:", selections.length);
+      // Fetch all selectedTutors (lecturer -> tutors chosen)
+      const selectedTutors = await selectedTutorsRepository.find({
+        relations: ["tutors"],
+      });
 
-      const userCourseCount: Record<number, number> = {};
+      // Fetch all courses (to get lecturer per course)
+      const allCourses = await courseRepository.find({
+        relations: ["lecturer"],
+      });
+
+      // Build a map: lecturerId -> set of tutorIds chosen
+      const lecturerToTutorIds = new Map<number, Set<number>>();
+      for (const st of selectedTutors) {
+        const tutorIds = new Set(st.tutors.map((t) => t.id));
+        lecturerToTutorIds.set(st.lecturerId, tutorIds);
+      }
+
+      // Build a map: courseId -> lecturerId
+      const courseToLecturer = new Map<number, number>();
+      for (const course of allCourses) {
+        if (course.lecturer) {
+          courseToLecturer.set(course.id, course.lecturer.id);
+        }
+      }
+
+      // Count how many courses each candidate is *actually chosen for*
+      const userChosenCourseCount = new Map<number, number>();
 
       for (const selection of selections) {
         const userId = selection.user?.id;
         if (!userId) continue;
-        const courseCount = selection.courses?.length || 0;
-        userCourseCount[userId] = (userCourseCount[userId] || 0) + courseCount;
-      }
 
-      const over3UserIds = Object.entries(userCourseCount)
-        .filter(([_, count]) => count > 3)
-        .map(([id]) => parseInt(id));
+        // For each course the candidate has applied for
+        for (const course of selection.courses) {
+          const lecturerId = courseToLecturer.get(course.id);
+          if (!lecturerId) continue;
 
-      console.log("User IDs with more than 3 courses:", over3UserIds);
-
-      if (over3UserIds.length === 0) return [];
-
-      const result = await userRepository.find({
-        where: {
-          id: In(over3UserIds),
-          role: "candidate",
-        },
-        relations: ["profile"],
-      });
-
-      console.log("Candidates with more than 3 courses found:", result.length);
-      return result;
-    },
-
-    candidatesWithNoCourses: async () => {
-      const selections = await selectedCoursesRepository.find({
-        relations: ["user", "courses"],
-      });
-
-      const selectedUserIds = new Set<number>();
-
-      for (const selection of selections) {
-        const userId = selection.user?.id;
-        const courseCount = selection.courses?.length || 0;
-        if (userId && courseCount > 0) {
-          selectedUserIds.add(userId);
+          // Check if this candidate is chosen by this lecturer
+          const chosenTutorIds = lecturerToTutorIds.get(lecturerId);
+          if (chosenTutorIds && chosenTutorIds.has(userId)) {
+            userChosenCourseCount.set(
+              userId,
+              (userChosenCourseCount.get(userId) || 0) + 1
+            );
+          }
         }
       }
 
-      console.log(
-        "User IDs with at least one course:",
-        Array.from(selectedUserIds)
-      );
+      // Filter users chosen for more than 3 courses
+      const over3UserIds = Array.from(userChosenCourseCount.entries())
+        .filter(([_, count]) => count > 3)
+        .map(([userId]) => userId);
 
-      const allCandidates = await userRepository.find({
-        where: { role: "candidate" },
+      if (over3UserIds.length === 0) return [];
+
+      // Fetch full user info
+      const users = await userRepository.find({
+        where: { id: In(over3UserIds), role: "Candidate" },
         relations: ["profile"],
       });
 
-      const result = allCandidates.filter(
-        (user) => !selectedUserIds.has(user.id)
+      return users;
+    },
+
+    candidatesWithNoCourses: async () => {
+      // Same fetching as above
+      const selections = await selectedCoursesRepository.find({
+        relations: ["user", "courses"],
+      });
+      const selectedTutors = await selectedTutorsRepository.find({
+        relations: ["tutors"],
+      });
+      const allCourses = await courseRepository.find({
+        relations: ["lecturer"],
+      });
+
+      // Build lecturer -> chosen tutor IDs map
+      const lecturerToTutorIds = new Map<number, Set<number>>();
+      for (const st of selectedTutors) {
+        const tutorIds = new Set(st.tutors.map((t) => t.id));
+        lecturerToTutorIds.set(st.lecturerId, tutorIds);
+      }
+
+      // Build course -> lecturer map
+      const courseToLecturer = new Map<number, number>();
+      for (const course of allCourses) {
+        if (course.lecturer) {
+          courseToLecturer.set(course.id, course.lecturer.id);
+        }
+      }
+
+      // Collect all candidates who are chosen for any course
+      const chosenCandidates = new Set<number>();
+      for (const selection of selections) {
+        const userId = selection.user?.id;
+        if (!userId) continue;
+
+        for (const course of selection.courses) {
+          const lecturerId = courseToLecturer.get(course.id);
+          if (!lecturerId) continue;
+
+          const chosenTutorIds = lecturerToTutorIds.get(lecturerId);
+          if (chosenTutorIds && chosenTutorIds.has(userId)) {
+            chosenCandidates.add(userId);
+          }
+        }
+      }
+
+      // Fetch all candidates
+      const allCandidates = await userRepository.find({
+        where: { role: "Candidate" },
+        relations: ["profile"],
+      });
+
+      // Filter candidates who were never chosen for any course
+      const noCourseCandidates = allCandidates.filter(
+        (candidate) => !chosenCandidates.has(candidate.id)
       );
 
-      console.log("Candidates with no courses found:", result.length);
-
-      return result;
+      return noCourseCandidates;
     },
-    login: async (
-      _parent: unknown,
-      args: { username: string; password: string }
-    ): Promise<string> => {
-      const { username, password } = args;
 
-      // Here username is actually email
-      const user = await userRepository.findOne({ where: { firstName: username } });
-      if (!user) throw new Error("Invalid credentials");
+    login: async (
+      _: any,
+      { username, password }: { username: string; password: string }
+    ) => {
+      const user = await userRepository.findOne({
+        where: { firstName: username },
+      });
+      if (!user) {
+        throw new Error("Invalid username or password");
+      }
 
       const validPassword = await bcrypt.compare(password, user.password);
-      if (!validPassword) throw new Error("Invalid credentials");
+      if (!validPassword) {
+        throw new Error("Invalid username or password");
+      }
 
-      return jwt.sign(
-        { id: user.id, email: user.firstName, role: user.role },
-        JWT_SECRET,
-        { expiresIn: "1h" }
-      );
+      if (user.role !== "Admin") {
+        throw new Error("Access denied: Only Admin users can log in");
+      }
+
+      const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      return token;
     },
   },
 
   Mutation: {
+    updateUser: async (
+      _: any,
+      {
+        id,
+        firstName,
+        lastName,
+        role,
+      }: { id: string; firstName?: string; lastName?: string; role?: string }
+    ) => {
+      const user = await userRepository.findOne({
+        where: { id: parseInt(id) },
+      });
+      if (!user) throw new Error("User not found");
+
+      if (firstName !== undefined) user.firstName = firstName;
+      if (lastName !== undefined) user.lastName = lastName;
+      if (role !== undefined) user.role = role;
+
+      return await userRepository.save(user);
+    },
+
+    createUser: async (
+      _: any,
+      {
+        input,
+      }: {
+        input: {
+          firstName: string;
+          lastName: string;
+          email: string;
+          role: string;
+          password: string;
+        };
+      }
+    ) => {
+      // Find max existing ID in users tableconst latestUsers = await userRepository.find({
+      const latestUsers = await userRepository.find({
+        order: { id: "DESC" },
+        take: 1,
+      });
+
+      const latestUser = latestUsers[0];
+
+      const newId = latestUser ? latestUser.id + 1 : 1; // if no users, start at 1
+
+      // Hash the password
+      const hashedPassword = await bcrypt.hash(input.password, 10);
+
+      const profile = profileRepository.create({
+        about: "",
+        pictureURI: "https://mighty.tools/mockmind-api/content/abstract/47.jpg",
+        prevRoles: [],
+        availability: "",
+        skills: [],
+        credentials: [],
+        agg_selected: 0,
+      });
+
+      const newUser = userRepository.create({
+        id: newId,
+        firstName: input.firstName,
+        lastName: input.lastName,
+        email: input.email,
+        role: input.role,
+        password: hashedPassword,
+        isBlocked: false,
+        profile, // just assign, don't save separately
+      });
+
+      // Save user + profile in one step
+      await userRepository.save(newUser);
+
+      // Now create selectedCourses
+      const selectedCourses = selectedCoursesRepository.create({
+        user: newUser,
+        courses: [],
+      });
+
+      await selectedCoursesRepository.save(selectedCourses);
+
+      return await userRepository.findOne({
+        where: { id: newUser.id },
+        relations: ["profile"],
+      });
+    },
+
     createProfile: async (_: any, args: any) => {
       const profile = profileRepository.create(args);
       return await profileRepository.save(profile);

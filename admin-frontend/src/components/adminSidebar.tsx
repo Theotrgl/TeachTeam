@@ -2,9 +2,9 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 const navItems = [
-  { label: "User Access", href: "/block-users" },
+  { label: "User", href: "/block-users" },
   { label: "Courses", href: "/course" },
-  { label: "Candidates", href: "/users" },
+  { label: "List of Candidates", href: "/users" },
 ];
 
 export default function AdminSidebar() {

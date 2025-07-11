@@ -6,6 +6,7 @@ import profileRoutes from "./routes/profile.routes";
 import courseRoutes from "./routes/course.routes";
 import tutorRoutes from "./routes/tutor.routes";
 import tutorOrderRoutes from "./routes/tutorOrder.routes";
+import commentRoutes from "./routes/comment.routes"
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
@@ -19,6 +20,7 @@ app.use("/api", profileRoutes)
 app.use("/api/", courseRoutes);
 app.use("/api/", tutorRoutes);
 app.use("/api/", tutorOrderRoutes)
+app.use("/api/", commentRoutes)
 
 AppDataSource.initialize()
   .then(() => {

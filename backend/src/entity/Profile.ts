@@ -6,9 +6,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm";
-
-import { PrevRoles } from "./prevRoles";
-
 // id: number;
 // about: string;
 // picture: string;
@@ -20,7 +17,7 @@ import { PrevRoles } from "./prevRoles";
 @Entity()
 export class Profile {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id!: number;      
 
   @Column()
   about!: string;

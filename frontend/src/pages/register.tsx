@@ -9,7 +9,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [role, setRole] = useState("candidate");
+  const [role, setRole] = useState("Candidate");
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -140,21 +140,6 @@ export default function RegisterPage() {
                 className="border border-border rounded-lg w-full py-2 px-3 text-black bg-background"
                 required
               />
-            </div>
-            <div className="mb-6">
-              <label className="block text-sm font-bold mb-2 text-black">
-                Role
-              </label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="border border-border rounded-lg w-full py-2 px-3 text-black bg-background"
-                required
-              >
-                <option value="candidate">Candidate</option>
-                <option value="Lecturer">Lecturer</option>
-                <option value="Tutor">Tutor</option>
-              </select>
             </div>
             <div className="mb-4 text-center">
               <p className="text-sm text-gray-600">

@@ -7,11 +7,14 @@ import {
   Profile,
   SelectedCourse,
   SelectedTutors,
+  userApi,
 } from "@/services/api";
 
 interface TutorContextType {
   tutors: User[];
+  allTutors: User[];
   setTutors: React.Dispatch<React.SetStateAction<User[]>>;
+  setAllTutors: React.Dispatch<React.SetStateAction<User[]>>; // setter for new state
   selectedTutors: SelectedTutors | null;
   selectedCourse: SelectedCourse[];
   tutorProfiles: Profile[];
@@ -34,6 +37,7 @@ export const TutorProvider = ({
   lecturerId?: number;
 }) => {
   const [tutors, setTutors] = useState<User[]>([]);
+  const [allTutors, setAllTutors] = useState<User[]>([]); // new state
   const [selectedTutors, setSelectedTutors] = useState<SelectedTutors | null>(
     null
   );
@@ -96,6 +100,15 @@ export const TutorProvider = ({
 
     fetchTutorsAndSelection();
   }, [user, users, profiles]);
+
+  useEffect(() => {
+    const fetchAllTutors = async () => {
+      const allUsers = await userApi.getAllUsers();
+      const candidates = allUsers.filter((u: User) => u.role === "Candidate");
+      setAllTutors(candidates);
+    };
+    fetchAllTutors();
+  }, []); // run once on mount
 
   const syncToBackend = async (updated: SelectedTutors) => {
     // console.log("[TutorContext] Syncing to backend:", updated);
@@ -164,12 +177,14 @@ export const TutorProvider = ({
     <TutorContext.Provider
       value={{
         tutors,
+        allTutors,
         selectedTutors,
         tutorProfiles,
         selectedCourse,
         addTutor,
         removeTutor,
         setTutors,
+        setAllTutors,
         isSelected,
         fetchSelectedTutors,
         setSelectedTutors,

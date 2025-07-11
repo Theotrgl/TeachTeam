@@ -5,72 +5,69 @@ This is a frontend-only React TypeScript project for the TeachTeam (TT) system. 
 ## 👨‍🏫 How to Run the Project
 
 1. **Clone the repo:**
-   ```bash
-   git clone git@github.com:Theotrgl/TeachTeam.git
-   ```
+    ```bash
+    git clone git@github.com:rmit-fsd-2025-s1/s4115252-s4115477-a2.git
+    cd assignment-2
+    ```
+
+2. **Go to respective folders:**
+
+    <table>
+    <thead>
+        <tr>
+        <td>
+            <pre><code>cd frontend</code></pre>
+        </td>
+        <td>
+            <pre><code>cd backend</code></pre>
+        </td>
+        <td>
+            <pre><code>cd admin-frontend</code></pre>
+        </td>
+        <td>
+            <pre><code>cd admin-backend</code></pre>
+        </td>
+        </tr>
+    </thead>
+    </table>
+
 
 2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+    ```bash
+    npm install
+    ```
 
 3. **Start the app:**
-   ```bash
-   npm run dev
-   ```
+    ```bash
+    npm run dev
+    ```
 
-The app will run at `http://localhost:3000` (or similar).
+The backend will run at `http://localhost:3001`,
+The admin-backend wil run at `http://localhost:3002/graphql`
+
+The frontend and admin frontend will run at `http://localhost:3000` (or similar)
 
 ## 🔐 Login Details
 
 Use the following dummy account to log in:
 
-**Tutor:**
+**Candidate:**
 - Email: `john123@gmail.com`
-- Password: `Password123!`
+- Password: `John123!`
 
 **Lecturer:**
 - Email: `jane123@gmail.com`
-- Password: `Password456!`
+- Password: `Jane123!`
 
-## 🧪 Features
-**Landing Page**
-Overview of what TeachTeam does
-Navigation bar (Sign In, Sign Up, etc.)
+**Admin:**
+- Username: `admin`
+- Password: `admin`
 
-**Sign In**
-Simple login form (email + password)
-Validates format and checks against dummy data
-Shows success message on login
+## 💻 ER Diagram
 
-**Tutor Page (after login as tutor)**
-1. Fill profile page (`http://localhost:3000/profile`) with:
+The following is the ER (Entity-Relationship) diagram that represent the database schema for the website.
 
-- Previous roles
-- Skills and credentials
-- Availability
-
-2. Submit an application (`http://localhost:3000/course-select`) with:
-
-
-**Lecturer Page (after login as lecturer)**
-1. View list of tutor applications (`http://localhost:3000/tutors`)
-
-2. Filter/search by course, name, availability, or skills
-
-3. Rank, and comment on applicants on profile page (`http://localhost:3000/profile`)
-
-4. See visual stats:
-
-- Most chosen
-- Least chosen
-- Not chosen applicants
-
-## 🛠️ Tech Stack
-- **React + TypeScript**
-- **Tailwind CSS (for styling)**
-- **HTML5 localStorage (for data)**
-- **Jest (unit tests)**
+<img src="Database ER diagram.png">
 
 ## 🎨 Assets & Resources
 - **Images**: Unsplash
@@ -78,6 +75,3 @@ Shows success message on login
 - **Avatars**: UI Faces
 
 - **Icons**: Material Icons
-
-## 🔒 Licensing & Attribution
-This project only uses **free and royalty-free** digital assets. All styles and components are custom-built, in line with academic policy.

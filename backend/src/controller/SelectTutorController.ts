@@ -78,7 +78,7 @@ export const getUniqueTutors = async (req: Request, res: Response) => {
         (course) => course.lecturer?.id === lecturerId
       );
 
-      if (hasCourseByLecturer && entry.user?.role === "candidate") {
+      if (hasCourseByLecturer && entry.user?.role === "Candidate") {
         tutorMap.set(entry.user.id, entry.user);
       }
     }

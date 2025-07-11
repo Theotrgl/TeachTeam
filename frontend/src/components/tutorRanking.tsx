@@ -3,11 +3,11 @@ import { useTutor } from "@/context/tutorContext";
 import { JSX, useMemo } from "react";
 
 export default function TutorRanking(): JSX.Element {
-  const { tutors } = useTutor();
+  const { allTutors } = useTutor();
   const { profiles } = useAuth();
 
   const rankedTutors = useMemo(() => {
-    const enriched = [...tutors].map((tutor) => {
+    const enriched = [...allTutors].map((tutor) => {
       const profile = tutor.profile;
       return {
         ...tutor,
@@ -16,7 +16,7 @@ export default function TutorRanking(): JSX.Element {
     });
 
     return enriched.sort((a, b) => b.aggSelected - a.aggSelected);
-  }, [tutors, profiles]);
+  }, [allTutors, profiles]);
 
   const maxSelected = rankedTutors[0]?.aggSelected ?? 0;
   const minSelected = rankedTutors[rankedTutors.length - 1]?.aggSelected ?? 0;
